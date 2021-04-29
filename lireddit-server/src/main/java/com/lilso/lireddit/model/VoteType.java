@@ -1,5 +1,7 @@
 package com.lilso.lireddit.model;
 
+import com.lilso.lireddit.exceptions.LiredditException;
+
 import java.util.Arrays;
 
 public enum VoteType {
@@ -14,10 +16,10 @@ public enum VoteType {
         return direction;
     }
 
-//    public static VoteType lookup(Integer direction) {
-//        return Arrays.stream(VoteType.values())
-//                .filter(value -> value.getDirection().equals(direction))
-//                .findAny()
-//                .orElseThrow(() -> new )
-//    }
+    public static VoteType lookup(Integer direction) {
+        return Arrays.stream(VoteType.values())
+                .filter(value -> value.getDirection().equals(direction))
+                .findAny()
+                .orElseThrow(() -> new LiredditException("Vote not found"));
+    }
 }
