@@ -34,5 +34,5 @@ public class User {
 
     private Instant created;
 
-    private boolean enable;
+    private boolean enabled;
 }
