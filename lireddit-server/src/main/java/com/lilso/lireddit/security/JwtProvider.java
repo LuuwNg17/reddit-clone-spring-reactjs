@@ -1,6 +1,7 @@
 package com.lilso.lireddit.security;
 
 import com.lilso.lireddit.exceptions.LiredditException;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
@@ -43,5 +44,29 @@ public class JwtProvider {
         } catch(KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException ex) {
             throw new LiredditException("Exception occurred while loading keystore");
         }
+    }
+
+    public boolean validateToken(String jwt) {
+        Jwts.parserBuilder().setSigningKey(getPublicKey()).build().parseClaimsJws(jwt);
+        return true;
+    }
+
+    private PublicKey getPublicKey() {
+        try {
+            return keyStore.getCertificate("springblog").getPublicKey();
+        } catch(KeyStoreException ex) {
+            throw new LiredditException("Exception occurred while " +
+                    "retrieving public key from keystore");
+        }
+    }
+
+    public String getUsernameFromJwt(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getPublicKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.getSubject();
     }
 }
