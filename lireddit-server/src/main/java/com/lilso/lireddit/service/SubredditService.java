@@ -1,6 +1,8 @@
 package com.lilso.lireddit.service;
 
 import com.lilso.lireddit.dto.SubredditDto;
+import com.lilso.lireddit.exceptions.LiredditException;
+import com.lilso.lireddit.mapper.SubredditMapper;
 import com.lilso.lireddit.model.Subreddit;
 import com.lilso.lireddit.repository.SubredditRepository;
 import lombok.AllArgsConstructor;
@@ -18,10 +20,11 @@ import static java.util.stream.Collectors.toList;
 public class SubredditService {
 
     private final SubredditRepository subredditRepository;
+    private final SubredditMapper subredditMapper;
 
     @Transactional
     public SubredditDto save(SubredditDto subredditDto){
-        Subreddit save = subredditRepository.save(mapSubredditDto(subredditDto));
+        Subreddit save = subredditRepository.save(subredditMapper.mapDtoToSubreddit(subredditDto));
         subredditDto.setId(save.getId());
         return subredditDto;
     }
@@ -30,21 +33,15 @@ public class SubredditService {
     public List<SubredditDto> getAll() {
         return subredditRepository.findAll()
                 .stream()
-                .map(this::mapToDto)
+                .map(subredditMapper::mapSubredditToDto)
                 .collect(toList());
     }
 
-    private SubredditDto mapToDto(Subreddit subreddit) {
-        return SubredditDto.builder().name(subreddit.getName())
-                .id(subreddit.getId())
-                .numberOfPost(subreddit.getPosts().size())
-                .build();
+    public SubredditDto getSubreddit(Long id) {
+        Subreddit subreddit = subredditRepository.findById(id)
+                .orElseThrow(() -> new LiredditException("No Subreddit found with ID - " + id));
+        return subredditMapper.mapSubredditToDto(subreddit);
     }
 
-    private Subreddit mapSubredditDto(SubredditDto subredditDto) {
-        return Subreddit.builder().name(subredditDto.getName())
-                .description(subredditDto.getDescription())
-                .build();
-    }
 
 }
