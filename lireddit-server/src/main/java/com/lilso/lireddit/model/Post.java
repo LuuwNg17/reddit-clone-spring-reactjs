@@ -24,7 +24,7 @@ public class Post {
     private String postName;
 
     @Nullable
-    private String ulr;
+    private String url;
 
     @Nullable
     @Lob
